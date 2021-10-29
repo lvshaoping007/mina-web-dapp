@@ -41,3 +41,12 @@ header {
 #encryptMessageInput {
   margin-bottom: 1rem;
 }
+
+.btn-mina{
+  background-color: #6B5DFB;
+  color: white;
+}
+.btn-mina:hover{
+  background-color: #4f3efd;
+  color: white;
+}

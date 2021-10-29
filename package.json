@@ -1,7 +1,7 @@
 {
-  "name": "mina-test-dapp",
+  "name": "auro-test-dapp",
   "version": "1.0.0",
-  "description": "A simple dapp used in Mina e2e tests.",
+  "description": "A simple dapp used in auro e2e tests.",
   "engines": {
     "node": ">= 12.0.0"
   },
