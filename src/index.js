@@ -7,10 +7,12 @@ const initializeMina = async () => {
 
   onboardButton.onclick = () => {
     if (!window.mina) {
-      alert("请先安装mina-extension-wallet")
+      alert("请先安装auro-extension-wallet")
     } else {
       onboardButton.innerText = 'Onboarding in progress'
-      window.mina.requestAccounts().then((approveAccount) => {
+      window.mina.requestAccounts().then((data) => {
+        let approveAccount = data.result
+        console.log('requestAccounts=', approveAccount)
         if (Array.isArray(approveAccount) && approveAccount.length > 0) {
           account = approveAccount
           document.getElementById('accounts').innerHTML = approveAccount;
@@ -28,7 +30,8 @@ const initializeMina = async () => {
    */
   getAccountsButton.onclick = async () => {
     if (window.mina) {
-      account = await window.mina.getAccounts();
+      let approveAccount = await window.mina.requestAccounts();
+      account = approveAccount.result
       if (Array.isArray(account) && account.length > 0) {
         getAccountsResults.innerHTML = account || 'Not able to get accounts'
       }
@@ -42,21 +45,22 @@ const initializeMina = async () => {
   const sendResultDisplay = document.getElementById('sendResultDisplay')
 
   /**
-   * send transfer // 转账
+   * transfer 
    */
   sendButton.onclick = async () => {
     let from = account && account.length > 0 ? account[0] : ""
-    let signResult = await window.mina.signTransaction({
+    let signResult = await window.mina.signTransfer({
       amount: sendAmountInput.value,
       from: from,
       to: receiveAddressInput.value,
     })
-    sendResultDisplay.innerHTML = signResult.error || signResult.hash
+    console.log('signResult--0', signResult)
+    sendResultDisplay.innerHTML = signResult.error || signResult.result.hash
   }
 
 
   /**
-   * add escrow 质押
+   * staking
    */
   const stakingButton = document.getElementById('stakingButton')
   const vaildatorAddressInput = document.getElementById('vaildatorAddressInput')
@@ -64,11 +68,12 @@ const initializeMina = async () => {
 
   stakingButton.onclick = async () => {//质押不用输入金额
     let from = account && account.length > 0 ? account[0] : ""
-    let signResult = await window.mina.stakingTransaction({
+    let signResult = await window.mina.signStaking({
       from: from,
       to: vaildatorAddressInput.value,
     })
-    stakingResultDisplay.innerHTML = signResult.error || signResult.hash
+    console.log('signVerifyButton--0', signResult)
+    stakingResultDisplay.innerHTML = signResult.error || signResult.result.hash
   }
 
   /**
@@ -89,7 +94,8 @@ const initializeMina = async () => {
       from: from,
       message: signMessageContent.value,
     })
-    signMessageResult.innerHTML = signResult.error || signResult.signature
+    console.log('signMessageButton--0', signResult)
+    signMessageResult.innerHTML = signResult.error || signResult.result.signature
   }
 
   /**
@@ -97,28 +103,14 @@ const initializeMina = async () => {
    */
   signVerifyButton.onclick = async () => {
     let messageVerifyResult = await window.mina.verifyMessage({
-      message: signResult.signature,
+      message: signResult?.result?.signature,
     })
-    verifyResult.innerHTML = messageVerifyResult?.error?.message || messageVerifyResult
+    console.log('signVerifyButton--0', messageVerifyResult)
+    verifyResult.innerHTML = messageVerifyResult?.error || messageVerifyResult.result
   }
 
 
-
-  /**
-   * get account from extension
-   */
-  async function getAccount() {
-    if (window.mina) {
-      account = await window.mina.getAccounts()
-      if (Array.isArray(account) && account.length > 0) {
-        onboardButton.innerText = 'Connected'
-        onboardButton.disabled = true
-        document.getElementById('accounts').innerHTML = account[0] || "";
-      }
-    }
-  }
   setTimeout(() => {
-    getAccount()
     if (window.mina) {
       window.mina.onAccountChange('accountsChanged', handleNewAccounts);
     }
